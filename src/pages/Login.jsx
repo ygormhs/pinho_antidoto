@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Loader2, Mail, ArrowRight } from 'lucide-react';
@@ -8,6 +9,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { login } = useAuth();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,7 +19,7 @@ export default function Login() {
         try {
             await new Promise(resolve => setTimeout(resolve, 5000));
             await login(email);
-            // Redirect happens automatically as AuthProvider state changes
+            navigate('/');
         } catch (err) {
             setError(err.message || 'Erro ao tentar entrar.');
         } finally {
