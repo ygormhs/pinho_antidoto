@@ -36,7 +36,7 @@ export default function CheckIn() {
     const fetchEntry = async (date) => {
         const { data } = await supabase
             .from('daily_logs')
-            .select('tasks, notes')
+            .select('*')
             .eq('user_email', session.user.email)
             .eq('entry_date', date)
             .single();

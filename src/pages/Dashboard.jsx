@@ -25,7 +25,6 @@ export default function Dashboard() {
             .eq('user_email', session.user.email);
 
         if (data) {
-            // Map to the format Heatmap expects if necessary
             setEntries(data);
         }
         setLoading(false);
