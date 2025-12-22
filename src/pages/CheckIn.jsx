@@ -85,8 +85,25 @@ export default function CheckIn() {
 
         setLoading(false);
         setSuccess(true);
-        setHasExistingData(true); // Now it has data
+        setHasExistingData(true);
         setTimeout(() => setSuccess(false), 3000);
+    };
+
+    // Definitive approach for date picking:
+    // Some browsers block showPicker if not immediately following a user gesture.
+    // We'll use a hidden input and proxy the click properly.
+    const openDatePicker = () => {
+        if (dateInputRef.current) {
+            try {
+                if (dateInputRef.current.showPicker) {
+                    dateInputRef.current.showPicker();
+                } else {
+                    dateInputRef.current.click();
+                }
+            } catch (err) {
+                dateInputRef.current.click();
+            }
+        }
     };
 
     return (
@@ -100,13 +117,18 @@ export default function CheckIn() {
                 </div>
 
                 <div className="relative group inline-block">
-                    {/* Visual Button */}
-                    <div className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-[12px] text-sm font-bold text-[#111827] shadow-lg group-hover:shadow-xl transition-all duration-200 cursor-pointer">
+                    {/* Visual Button - Responsive to click */}
+                    <button
+                        type="button"
+                        onClick={openDatePicker}
+                        className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-[12px] text-sm font-bold text-[#111827] shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
+                    >
                         <Calendar size={18} />
                         <span>Escolher Data</span>
                         <ChevronDown size={14} className="text-gray-300 ml-1" />
-                    </div>
-                    {/* Actual Hidden Input - Covers the whole button area for 100% click reliability */}
+                    </button>
+
+                    {/* Hidden Date Input */}
                     <input
                         ref={dateInputRef}
                         type="date"
@@ -114,7 +136,8 @@ export default function CheckIn() {
                         max="2030-12-31"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50 rounded-[12px]"
+                        className="absolute h-0 w-0 opacity-0 pointer-events-none"
+                        style={{ border: 'none', padding: 0 }}
                     />
                 </div>
             </header>
