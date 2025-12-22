@@ -19,10 +19,22 @@ export default function Dashboard() {
     }, [session]);
 
     const fetchEntries = async () => {
+        let userId = session.user.id;
+
+        // Safety: resolve email-id to UUID
+        if (userId && userId.includes('@')) {
+            const { data: userData } = await supabase
+                .from('allowed_users')
+                .select('id')
+                .eq('email', session.user.email)
+                .single();
+            if (userData) userId = userData.id;
+        }
+
         const { data, error } = await supabase
             .from('diario_2026')
             .select('*')
-            .eq('user_id', session.user.id);
+            .eq('user_id', userId);
 
         if (data) {
             setEntries(data);
