@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { QUOTES } from '../constants/quotes';
 
 export default function Dashboard() {
-    const { session } = useAuth();
+    const { session, logout } = useAuth();
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [quote, setQuote] = useState({ text: '', author: '' });

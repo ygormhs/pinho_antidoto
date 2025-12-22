@@ -208,30 +208,30 @@ export default function Exercises() {
                                         </button>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-8">
-                                        <div className="bg-white p-10 rounded-[3rem] border border-white/50 shadow-3d flex items-center gap-8 group">
-                                            <div className="bg-gray-50 p-6 rounded-3xl group-hover:bg-brand-text group-hover:text-white transition-colors duration-500">
-                                                <History size={32} />
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-50 shadow-3d flex items-center gap-6 group">
+                                            <div className="bg-gray-50 p-5 rounded-2xl group-hover:bg-brand-text group-hover:text-white transition-colors duration-500">
+                                                <History size={28} />
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Frequência</p>
-                                                <p className="text-5xl font-black tracking-tighter">
-                                                    {meditationStats.totalDays} <span className="text-xl opacity-20">dias</span>
+                                                <p className="text-5xl font-black tracking-tighter text-gray-800">
+                                                    {meditationStats.totalDays} <span className="text-lg text-gray-400 ml-1">dias</span>
                                                 </p>
-                                                <p className="text-xs text-brand-text font-bold mt-1">meditados conosco</p>
+                                                <p className="text-xs text-brand-text font-bold mt-1 opacity-60">meditados</p>
                                             </div>
                                         </div>
 
-                                        <div className="bg-white p-10 rounded-[3rem] border border-white/50 shadow-3d flex items-center gap-8 group">
-                                            <div className="bg-gray-50 p-6 rounded-3xl group-hover:bg-brand-text group-hover:text-white transition-colors duration-500">
-                                                <Clock size={32} />
+                                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-50 shadow-3d flex items-center gap-6 group">
+                                            <div className="bg-gray-50 p-5 rounded-2xl group-hover:bg-brand-text group-hover:text-white transition-colors duration-500">
+                                                <Clock size={28} />
                                             </div>
                                             <div className="text-left">
-                                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Tempo Focado</p>
-                                                <p className="text-5xl font-black tracking-tighter">
-                                                    {meditationStats.totalMinutes} <span className="text-xl opacity-20">min</span>
+                                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Tempo Total</p>
+                                                <p className="text-5xl font-black tracking-tighter text-gray-800">
+                                                    {meditationStats.totalMinutes} <span className="text-lg text-gray-400 ml-1">min</span>
                                                 </p>
-                                                <p className="text-xs text-brand-text font-bold mt-1">meditados conosco</p>
+                                                <p className="text-xs text-brand-text font-bold mt-1 opacity-60">de foco</p>
                                             </div>
                                         </div>
                                     </div>
