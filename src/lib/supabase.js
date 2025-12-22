@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Hardcoded for zero-config Vercel deployment as requested
+const supabaseUrl = 'https://rajkiubsbhnowhlrccfo.supabase.co';
+const supabaseKey = 'sb_publishable_5uoWS5gNZICZkdiHRtaDbA_tY89lH03';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
