@@ -86,11 +86,11 @@ export default function Exercises() {
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
+        return ;
     };
 
     return (
-        <div className="max-w-4xl mx-auto py-12">
+        <div className="max-w-4xl mx-auto py-12 pb-32 lg:pb-12">
             <header className="mb-12 flex flex-col items-center">
                 <h2 className="text-5xl font-black tracking-tighter mb-10 text-brand-text">Exercícios</h2>
 
@@ -156,14 +156,14 @@ export default function Exercises() {
                                     <h3 className="text-2xl font-black tracking-tight flex items-center gap-3">
                                         <Clock className="text-gray-300" /> Escolha o seu tempo
                                     </h3>
-                                    <div className="grid grid-cols-5 gap-6 w-full max-w-3xl">
+                                    <div className="grid grid-cols-5 gap-6 w-full max-w-3xl overflow-x-auto pb-4 px-4 snap-x">
                                         {timerOptions.map((min, idx) => (
                                             <motion.button
                                                 key={min}
                                                 whileHover={{ y: -5, shadow: "var(--shadow-3d-lg)" }}
                                                 whileTap={{ scale: 0.95 }}
                                                 onClick={() => startMeditation(min)}
-                                                className="bg-white border border-white/50 p-6 rounded-[2rem] font-black text-center shadow-3d transition-all group"
+                                                className="bg-white border border-white/50 p-6 rounded-[2rem] font-black text-center shadow-3d transition-all group min-w-[80px] snap-center"
                                             >
                                                 <span className="text-3xl block mb-1 text-brand-text group-hover:scale-110 transition-transform">{min}</span>
                                                 <span className="text-[10px] uppercase tracking-[0.2em] font-black text-gray-300">Min</span>
