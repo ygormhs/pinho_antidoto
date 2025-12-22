@@ -22,6 +22,13 @@ export default function Heatmap({ entries = [], showTitle = true }) {
         return null;
     };
 
+    // Debug: log entries on first load
+    React.useEffect(() => {
+        if (entries.length > 0) {
+            console.log('Heatmap entries loaded:', entries.map(e => e.date));
+        }
+    }, [entries]);
+
     return (
         <div className="bg-white p-8 rounded-[2rem] border border-white/50 shadow-3d-lg overflow-x-auto">
             <div className="flex flex-col gap-6 min-w-[800px]">
@@ -42,11 +49,17 @@ export default function Heatmap({ entries = [], showTitle = true }) {
                 )}
 
                 <div className="grid grid-flow-col grid-rows-7 gap-1.5">
-                    {days.map((day) => {
+                    {days.map((day, idx) => {
                         const entry = getEntryContent(day);
                         const active = !!entry;
                         const dateStr = format(day, 'dd/MM/yyyy');
-                        const tooltipId = `tooltip-${day.toISOString()}`;
+                        const dateKey = format(day, 'yyyy-MM-dd');
+                        const tooltipId = `tooltip-${dateKey}`;
+
+                        // Debug first 5 days of January
+                        if (idx < 5) {
+                            console.log(`Day ${idx}: ${dateKey}, entry found: ${active}`);
+                        }
 
                         // Generate summary for tooltip
                         let summary = "Sem registros";
@@ -61,7 +74,7 @@ export default function Heatmap({ entries = [], showTitle = true }) {
                         }
 
                         return (
-                            <div key={day.toISOString()}> {/* Wrapper for tooltip anchor */}
+                            <div key={dateKey}> {/* Wrapper for tooltip anchor */}
                                 <motion.div
                                     data-tooltip-id={tooltipId}
                                     data-tooltip-content={`${dateStr} - ${summary}`}

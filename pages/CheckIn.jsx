@@ -134,11 +134,11 @@ export default function CheckIn() {
                     </p>
                 </div>
 
-                <div className="relative group inline-block">
+                <div className="relative inline-block">
                     <button
                         type="button"
                         onClick={openDatePicker}
-                        className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-[12px] text-sm font-bold text-[#111827] shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
+                        className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-[12px] text-sm font-bold text-[#111827] shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 relative z-10"
                     >
                         <Calendar size={18} />
                         <span>Escolher Data</span>
@@ -151,27 +151,27 @@ export default function CheckIn() {
                         max="2026-12-31"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        className="absolute top-0 left-0 w-full h-full opacity-0 pointer-events-none"
                     />
                 </div>
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-5">
                     {questions.map((q) => (
                         <motion.div
                             key={q.id}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleToggle(q.id)}
-                            className={`flex items-center gap-4 p-5 rounded-[14px] border transition-all duration-200 ease-out cursor-pointer select-none ${formData[q.id]
+                            className={`flex items-center gap-5 p-6 rounded-[16px] border transition-all duration-200 ease-out cursor-pointer select-none ${formData[q.id]
                                 ? 'bg-[#111827] border-[#111827] text-white shadow-xl scale-[1.02]'
-                                : 'bg-white border-gray-50 text-[#111827] hover:border-gray-200 shadow-lg hover:shadow-xl hover:-translate-y-1'
+                                : 'bg-white border-gray-100 text-[#111827] hover:border-gray-200 shadow-md hover:shadow-lg'
                                 }`}
                         >
-                            <div className={`p-2.5 rounded-[8px] ${formData[q.id] ? 'bg-white/10' : 'bg-gray-50'}`}>
-                                <q.icon size={20} strokeWidth={formData[q.id] ? 3 : 2} />
+                            <div className={`p-3 rounded-xl ${formData[q.id] ? 'bg-white/10' : 'bg-gray-50'}`}>
+                                <q.icon size={18} strokeWidth={formData[q.id] ? 2.5 : 1.5} />
                             </div>
-                            <span className="font-bold text-sm tracking-tight leading-tight">{q.label}</span>
+                            <span className="font-medium text-[15px] leading-snug">{q.label}</span>
                         </motion.div>
                     ))}
                 </div>

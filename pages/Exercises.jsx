@@ -14,7 +14,7 @@ export default function Exercises() {
     const [showPlim, setShowPlim] = useState(false);
     const [meditationStats, setMeditationStats] = useState({ totalMinutes: 0, totalDays: 0, entries: [] });
     const [refreshing, setRefreshing] = useState(false);
-    const timerOptions = [1, 5, 10, 15, 30];
+    const timerOptions = [1, 5, 10, 15, 30, 60];
 
     useEffect(() => { if (session?.user) fetchMeditationStats(); }, [session]);
 
