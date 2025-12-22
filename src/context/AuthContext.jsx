@@ -8,46 +8,40 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setLoading(false);
-        });
-
-        // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setLoading(false);
-        });
-
-        return () => subscription.unsubscribe();
+        // Check for pseudo-session in localStorage
+        const savedUser = localStorage.getItem('antidoto_user');
+        if (savedUser) {
+            setSession({ user: JSON.parse(savedUser) });
+        }
+        setLoading(false);
     }, []);
 
     const login = async (email) => {
+        const cleanEmail = email.trim().toLowerCase();
+
         // Whitelist check
         const { data, error: countError } = await supabase
             .from('allowed_users')
             .select('email')
-            .eq('email', email)
+            .eq('email', cleanEmail)
             .single();
 
         if (countError || !data) {
             throw new Error('Acesso não autorizado. Adquira o Antídoto.');
         }
 
-        // Sign in with OTP (Magic Link)
-        const { error: authError } = await supabase.auth.signInWithOtp({
-            email,
-            options: {
-                emailRedirectTo: window.location.origin
-            }
-        });
+        // Create pseudo-session
+        const pseudoUser = { email: cleanEmail, id: cleanEmail };
+        localStorage.setItem('antidoto_user', JSON.stringify(pseudoUser));
+        setSession({ user: pseudoUser });
 
-        if (authError) throw authError;
         return true;
     };
 
-    const logout = () => supabase.auth.signOut();
+    const logout = () => {
+        localStorage.removeItem('antidoto_user');
+        setSession(null);
+    };
 
     return (
         <AuthContext.Provider value={{ session, user: session?.user, loading, login, logout }}>

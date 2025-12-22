@@ -40,7 +40,7 @@ export default function Exercises() {
         const { data } = await supabase
             .from('meditacao_2026')
             .select('*')
-            .eq('user_id', session.user.id);
+            .eq('user_email', session.user.email);
         if (data) {
             const totalMin = data.reduce((acc, curr) => acc + curr.duration, 0);
             const uniqueDays = new Set(data.map(d => d.date)).size;
@@ -72,7 +72,7 @@ export default function Exercises() {
 
         // Save persistently
         await supabase.from('meditacao_2026').insert({
-            user_id: session.user.id,
+            user_email: session.user.email,
             duration: duration,
             date: today
         });

@@ -36,7 +36,7 @@ export default function CheckIn() {
         const { data } = await supabase
             .from('diario_2026')
             .select('*')
-            .eq('user_id', session.user.id)
+            .eq('user_email', session.user.email)
             .eq('date', date)
             .single();
 
@@ -70,10 +70,10 @@ export default function CheckIn() {
         await supabase
             .from('diario_2026')
             .upsert({
-                user_id: session.user.id,
+                user_email: session.user.email,
                 date: selectedDate,
                 ...formData
-            }, { onConflict: 'user_id,date' });
+            }, { onConflict: 'user_email,date' });
 
         setLoading(false);
         setSuccess(true);

@@ -23,7 +23,7 @@ export default function Dashboard() {
         const { data, error } = await supabase
             .from('diario_2026')
             .select('date')
-            .eq('user_id', session.user.id);
+            .eq('user_email', session.user.email);
 
         if (data) {
             setEntries(data);

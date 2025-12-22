@@ -17,7 +17,7 @@ export default function Login() {
 
         try {
             await login(email);
-            setSent(true);
+            // Redirect happens automatically as AuthProvider state changes
         } catch (err) {
             setError(err.message || 'Erro ao tentar entrar.');
         } finally {
