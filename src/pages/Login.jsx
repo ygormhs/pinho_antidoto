@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Loader2, Mail, ArrowRight } from 'lucide-react';
-import { DottedSurface } from '../components/ui/dotted-surface';
-import { TextShimmerWave } from '../components/ui/text-shimmer-wave';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -27,9 +25,7 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-brand-bg flex flex-col items-center justify-center p-6 relative overflow-hidden">
-            {/* Background 3D */}
-            <DottedSurface className="opacity-40" />
+        <div className="min-h-screen bg-brand-bg flex flex-col items-center justify-center p-6 relative overflow-hidden bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_70%)] from-white/20">
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -88,9 +84,7 @@ export default function Login() {
                                     {loading ? (
                                         <div className="flex items-center gap-3">
                                             <Loader2 className="animate-spin" size={20} />
-                                            <TextShimmerWave className="text-white font-black" duration={1} spread={1.5}>
-                                                Carregando diário...
-                                            </TextShimmerWave>
+                                            <span className="text-white font-black">Carregando diário...</span>
                                         </div>
                                     ) : (
                                         <>
