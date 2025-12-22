@@ -15,7 +15,7 @@ export default function Sidebar() {
     const { logout } = useAuth();
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-100 flex flex-col p-6 z-50">
+        <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-100 flex-col p-6 z-50">
             <div className="mb-12">
                 <h1 className="text-2xl font-bold tracking-tighter text-brand-text">Antídoto</h1>
             </div>
