@@ -35,21 +35,22 @@ export default function CheckIn() {
 
     const fetchEntry = async (date) => {
         const { data } = await supabase
-            .from('diario_2026')
-            .select('content')
+            .from('daily_logs')
+            .select('tasks, notes')
             .eq('user_email', session.user.email)
-            .eq('date', date)
+            .eq('entry_date', date)
             .single();
 
-        if (data && data.content) {
+        if (data) {
             setHasExistingData(true);
+            const savedTasks = data.tasks || {};
             setFormData({
-                work_good: data.content.work_good || false,
-                day_good: data.content.day_good || false,
-                sleep_good: data.content.sleep_good || false,
-                tasks_done: data.content.tasks_done || false,
+                work_good: savedTasks.work_good || false,
+                day_good: savedTasks.day_good || false,
+                sleep_good: savedTasks.sleep_good || false,
+                tasks_done: savedTasks.tasks_done || false,
             });
-            setNotes(data.content.notes || '');
+            setNotes(data.notes || '');
         } else {
             setHasExistingData(false);
             setFormData({
@@ -70,28 +71,29 @@ export default function CheckIn() {
         e.preventDefault();
         setLoading(true);
 
-        const contentToSave = {
-            ...formData,
+        const payload = {
+            user_email: session.user.email,
+            entry_date: selectedDate,
+            tasks: formData,
             notes: notes
         };
 
-        await supabase
-            .from('diario_2026')
-            .upsert({
-                user_email: session.user.email,
-                date: selectedDate,
-                content: contentToSave
-            }, { onConflict: 'user_email,date' });
+        const { error } = await supabase
+            .from('daily_logs')
+            .upsert(payload, { onConflict: 'user_email,entry_date' });
+
+        if (error) {
+            console.error('Erro ao salvar checklist:', error);
+            alert('Erro ao salvar. Verifique o console.');
+        } else {
+            setSuccess(true);
+            setHasExistingData(true);
+            setTimeout(() => setSuccess(false), 3000);
+        }
 
         setLoading(false);
-        setSuccess(true);
-        setHasExistingData(true);
-        setTimeout(() => setSuccess(false), 3000);
     };
 
-    // Definitive approach for date picking:
-    // Some browsers block showPicker if not immediately following a user gesture.
-    // We'll use a hidden input and proxy the click properly.
     const openDatePicker = () => {
         if (dateInputRef.current) {
             try {
@@ -117,7 +119,6 @@ export default function CheckIn() {
                 </div>
 
                 <div className="relative group inline-block">
-                    {/* Visual Button - Responsive to click */}
                     <button
                         type="button"
                         onClick={openDatePicker}
@@ -127,8 +128,6 @@ export default function CheckIn() {
                         <span>Escolher Data</span>
                         <ChevronDown size={14} className="text-gray-300 ml-1" />
                     </button>
-
-                    {/* Hidden Date Input */}
                     <input
                         ref={dateInputRef}
                         type="date"

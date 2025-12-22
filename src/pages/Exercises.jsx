@@ -30,10 +30,9 @@ export default function Exercises() {
 
     const fetchMeditationStats = async () => {
         setRefreshing(true);
-        // Lendo da tabela central diario_2026
         const { data } = await supabase
-            .from('diario_2026')
-            .select('date, content')
+            .from('daily_logs')
+            .select('entry_date, tasks')
             .eq('user_email', session.user.email);
 
         if (data) {
@@ -41,7 +40,7 @@ export default function Exercises() {
             let daysWithMeditation = 0;
 
             data.forEach(entry => {
-                const medMin = entry.content?.meditation_minutes || 0;
+                const medMin = entry.tasks?.meditation_minutes || 0;
                 if (medMin > 0) {
                     totalMin += medMin;
                     daysWithMeditation++;
@@ -77,29 +76,28 @@ export default function Exercises() {
         setTimer(null);
         setShowPlim(true);
 
-        // PERSISTÊNCIA NA TABELA CENTRAL (diario_2026)
-        // 1. Buscar se já existe registro para hoje
         const { data: existing } = await supabase
-            .from('diario_2026')
-            .select('content')
+            .from('daily_logs')
+            .select('tasks, notes')
             .eq('user_email', session.user.email)
-            .eq('date', today)
+            .eq('entry_date', today)
             .single();
 
-        const currentContent = existing?.content || {};
-        const newMeditationMinutes = (currentContent.meditation_minutes || 0) + duration;
+        const currentTasks = existing?.tasks || {};
+        const currentNotes = existing?.notes || '';
+        const newMeditationMinutes = (currentTasks.meditation_minutes || 0) + duration;
 
-        // 2. Upsert preservando dados já existentes no JSONB
         await supabase
-            .from('diario_2026')
+            .from('daily_logs')
             .upsert({
                 user_email: session.user.email,
-                date: today,
-                content: {
-                    ...currentContent,
+                entry_date: today,
+                tasks: {
+                    ...currentTasks,
                     meditation_minutes: newMeditationMinutes
-                }
-            }, { onConflict: 'user_email,date' });
+                },
+                notes: currentNotes
+            }, { onConflict: 'user_email,entry_date' });
 
         await fetchMeditationStats();
     };
@@ -136,7 +134,6 @@ export default function Exercises() {
                         {timer ? (
                             <div className="flex flex-col items-center justify-center py-8 gap-8">
                                 <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="w-64 h-64 lg:w-80 lg:h-80 rounded-full border-4 border-white shadow-2xl flex items-center justify-center bg-white/60 backdrop-blur-md relative overflow-hidden">
-                                    {/* Simple wave animation effect during timer */}
                                     <motion.div
                                         animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
                                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -217,7 +214,6 @@ export default function Exercises() {
                 )}
             </AnimatePresence>
 
-            {/* DEFINITIVE PLIM POPUP CENTERING */}
             <AnimatePresence>
                 {showPlim && (
                     <motion.div

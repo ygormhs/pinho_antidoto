@@ -12,9 +12,9 @@ export default function Heatmap({ entries = [], showTitle = true }) {
     }, []);
 
     const getEntryContent = (date) => {
-        const entry = entries.find(e => isSameDay(new Date(e.date), date));
-        // Check if entry exists and has non-empty content
-        if (entry && entry.content && Object.keys(entry.content).length > 0) {
+        const entry = entries.find(e => isSameDay(new Date(e.entry_date), date));
+        // Check if entry exists and has non-empty tasks
+        if (entry && entry.tasks && Object.keys(entry.tasks).length > 0) {
             return entry;
         }
         return null;
@@ -49,12 +49,13 @@ export default function Heatmap({ entries = [], showTitle = true }) {
                         // Generate summary for tooltip
                         let summary = "Sem registros";
                         if (active) {
-                            const c = entry.content;
+                            const c = entry.tasks;
                             const parts = [];
                             if (c.work_good) parts.push("Trabalho");
                             if (c.day_good) parts.push("Dia Bom");
                             if (c.sleep_good) parts.push("Sono");
                             if (c.tasks_done) parts.push("Metas");
+                            if (c.meditation_minutes) parts.push(`Meditação (${c.meditation_minutes}m)`);
                             summary = parts.length > 0 ? parts.join(", ") : "Registrado";
                         }
 

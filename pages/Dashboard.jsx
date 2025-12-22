@@ -20,11 +20,12 @@ export default function Dashboard() {
 
     const fetchEntries = async () => {
         const { data, error } = await supabase
-            .from('diario_2026')
-            .select('date, content')
+            .from('daily_logs')
+            .select('entry_date, tasks, notes')
             .eq('user_email', session.user.email);
 
         if (data) {
+            // Map to the format Heatmap expects if necessary
             setEntries(data);
         }
         setLoading(false);
