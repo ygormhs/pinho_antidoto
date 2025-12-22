@@ -87,77 +87,78 @@ export default function CheckIn() {
 
     return (
         <div className="max-w-xl mx-auto py-8 mb-24 lg:mb-0">
-            <header className="mb-8 flex flex-col items-center gap-6">
+            <header className="mb-12 flex flex-col items-center gap-6">
                 <div className="text-center">
-                    <h2 className="text-3xl font-black tracking-tighter mb-1 text-brand-text">Check-in</h2>
+                    <h2 className="text-4xl font-black tracking-tighter mb-1 text-[#111827]">Check-in</h2>
                     <p className="text-gray-400 text-sm font-medium capitalize">
                         {format(parseISO(selectedDate), "EEEE, d 'de' MMMM", { locale: ptBR })}
                     </p>
                 </div>
 
                 <div className="relative group">
-                    <div className="grid grid-cols-[auto_1fr] items-center gap-2 px-5 py-2 bg-white border border-gray-100 rounded-input text-xs font-black text-gray-700 shadow-md group-hover:shadow-lg group-hover:-translate-y-1 transition-all duration-200 ease-out cursor-pointer">
-                        <Calendar size={18} className="text-brand-text" />
+                    <div className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-[10px] text-xs font-black text-gray-700 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-1 transition-all duration-200 ease-out cursor-pointer">
+                        <Calendar size={18} className="text-[#111827]" />
                         <span>Escolher Data</span>
                         <ChevronDown size={14} className="text-gray-300 ml-1" />
                     </div>
-                    {/* Fixed Date Picker Overlay */}
+                    {/* Fixed Date Picker Overlay - Fully Functional */}
                     <input
                         ref={dateInputRef}
                         type="date"
-                        min="2020-01-01" // Expanded range to prevent user issue
+                        min="2024-01-01"
                         max="2030-12-31"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-[100]"
+                        onClick={(e) => e.stopPropagation()}
                     />
                 </div>
             </header>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-2 gap-4">
                     {questions.map((q) => (
                         <motion.div
                             key={q.id}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleToggle(q.id)}
-                            className={`flex items-center gap-3 p-4 rounded-card border transition-all duration-200 ease-out cursor-pointer select-none ${formData[q.id]
-                                ? 'bg-brand-text border-brand-text text-white shadow-md scale-[1.02]'
-                                : 'bg-white border-gray-50 text-brand-text hover:border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1'
+                            className={`flex items-center gap-4 p-5 rounded-[14px] border transition-all duration-200 ease-out cursor-pointer select-none ${formData[q.id]
+                                ? 'bg-[#111827] border-[#111827] text-white shadow-xl scale-[1.02]'
+                                : 'bg-white border-gray-50 text-[#111827] hover:border-gray-200 shadow-lg hover:shadow-xl hover:-translate-y-1'
                                 }`}
                         >
-                            <div className={`p-2 rounded-badge ${formData[q.id] ? 'bg-white/10' : 'bg-gray-50'}`}>
-                                <q.icon size={18} strokeWidth={formData[q.id] ? 3 : 2} />
+                            <div className={`p-2.5 rounded-[8px] ${formData[q.id] ? 'bg-white/10' : 'bg-gray-50'}`}>
+                                <q.icon size={20} strokeWidth={formData[q.id] ? 3 : 2} />
                             </div>
                             <span className="font-bold text-sm tracking-tight leading-tight">{q.label}</span>
                         </motion.div>
                     ))}
                 </div>
 
-                <div className="space-y-3">
-                    <label className="block font-black text-gray-400 text-[10px] uppercase tracking-[0.2em] ml-2">Diário</label>
+                <div className="space-y-4">
+                    <label className="block font-black text-gray-400 text-[11px] uppercase tracking-[0.25em] ml-2">Diário</label>
                     <textarea
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Escreva aqui o seu dia..."
-                        className="w-full bg-white border border-gray-50 rounded-card p-6 min-h-[140px] outline-none focus:ring-4 focus:ring-brand-text/5 transition-all text-sm resize-none shadow-sm hover:shadow-md focus:shadow-md placeholder:text-gray-300 leading-relaxed text-gray-700"
+                        className="w-full bg-white border border-gray-50 rounded-[14px] p-8 min-h-[180px] outline-none focus:ring-4 focus:ring-black/5 transition-all text-sm resize-none shadow-lg hover:shadow-xl focus:shadow-xl placeholder:text-gray-300 leading-relaxed text-gray-700"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-brand-text text-white py-3 rounded-input font-black text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-out disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-md"
+                    className="w-full bg-[#111827] text-white py-5 rounded-[10px] font-black text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-200 ease-out disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-xl active:scale-95"
                 >
                     {loading ? (
-                        <Loader2 className="animate-spin text-white" />
+                        <Loader2 className="animate-spin text-white" size={24} />
                     ) : success ? (
-                        <span className="flex items-center gap-2 italic">✓ Salvo.</span>
+                        <span className="flex items-center gap-2 italic">✓ Salvo com sucesso</span>
                     ) : (
-                        <>
-                            <Save size={18} />
+                        <div className="flex items-center gap-3">
+                            <Save size={20} />
                             <span>Finalizar Dia</span>
-                        </>
+                        </div>
                     )}
                 </button>
             </form>
