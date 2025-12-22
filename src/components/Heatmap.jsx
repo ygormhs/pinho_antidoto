@@ -12,7 +12,9 @@ export default function Heatmap({ entries = [], showTitle = true }) {
     }, []);
 
     const getEntryContent = (date) => {
-        const entry = entries.find(e => isSameDay(new Date(e.date), date));
+        // Use manual YYYY-MM-DD format to avoid timezone issues
+        const dateStr = format(date, 'yyyy-MM-dd');
+        const entry = entries.find(e => e.date === dateStr);
         // Check if entry exists and has any recorded activity
         if (entry && (entry.work_good || entry.day_good || entry.sleep_good || entry.tasks_done || entry.notes)) {
             return entry;
