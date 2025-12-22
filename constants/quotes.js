@@ -1,0 +1,22 @@
+export const QUOTES = [
+    { text: "A felicidade de sua vida depende da qualidade de seus pensamentos.", author: "Marco Aurélio" },
+    { text: "Não esperes que o mundo te dê o que desejas, mas sim que tu te dês ao mundo.", author: "Epicteto" },
+    { text: "O que não beneficia a colmeia, não beneficia a abelha.", author: "Marco Aurélio" },
+    { text: "Pense no que você tem em vez do que lhe falta.", author: "Marco Aurélio" },
+    { text: "A melhor vingança é ser diferente daquele que causou o dano.", author: "Marco Aurélio" },
+    { text: "A vida é muito curta para ser gasta reclamando.", author: "Sêneca" },
+    { text: "Nenhum homem é livre se não for mestre de si mesmo.", author: "Epicteto" },
+    { text: "Muitas vezes erra não apenas quem faz, mas também quem deixa de fazer.", author: "Marco Aurélio" },
+    { text: "Onde há um ser humano, há uma oportunidade para a bondade.", author: "Sêneca" },
+    { text: "Sorte é o que acontece quando a preparação encontra a oportunidade.", author: "Sêneca" },
+    { text: "Não se deve buscar a felicidade fora de si mesmo.", author: "Epicteto" },
+    { text: "A tranquilidade nada mais é do que a boa ordenação da mente.", author: "Marco Aurélio" },
+    { text: "Se não for o certo, não faça. Se não for verdade, não diga.", author: "Marco Aurélio" },
+    { text: "Enquanto vivemos, aprendamos a viver.", author: "Sêneca" },
+    { text: "O homem que sofre antes de ser necessário, sofre mais do que o necessário.", author: "Sêneca" },
+    { text: "A dificuldade fortalece a mente, assim como o trabalho fortalece o corpo.", author: "Sêneca" },
+    { text: "Não é porque as coisas são difíceis que não ousamos; é porque não ousamos que elas são difíceis.", author: "Sêneca" },
+    { text: "A riqueza não consiste em ter grandes posses, mas em ter poucas necessidades.", author: "Epicteto" },
+    { text: "Não explique sua filosofia. Corporifique-a.", author: "Epicteto" },
+    { text: "Tudo o que ouvimos é uma opinião, não um fato. Tudo o que vemos é uma perspectiva, não a verdade.", author: "Marco Aurélio" }
+];
