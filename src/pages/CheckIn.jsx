@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Save, Loader2, Calendar, Briefcase, Smile, Moon, Target, ChevronDown } from 'lucide-react';
+import { Check, Save, Loader2, Calendar, Briefcase, Smile, Moon, Target, ChevronDown, Edit3 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { format, parseISO } from 'date-fns';
@@ -18,6 +18,7 @@ export default function CheckIn() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+    const [hasExistingData, setHasExistingData] = useState(false);
     const [formData, setFormData] = useState({
         work_good: false,
         day_good: false,
@@ -41,6 +42,7 @@ export default function CheckIn() {
             .single();
 
         if (data && data.content) {
+            setHasExistingData(true);
             setFormData({
                 work_good: data.content.work_good || false,
                 day_good: data.content.day_good || false,
@@ -49,6 +51,7 @@ export default function CheckIn() {
             });
             setNotes(data.content.notes || '');
         } else {
+            setHasExistingData(false);
             setFormData({
                 work_good: false,
                 day_good: false,
@@ -82,26 +85,28 @@ export default function CheckIn() {
 
         setLoading(false);
         setSuccess(true);
+        setHasExistingData(true); // Now it has data
         setTimeout(() => setSuccess(false), 3000);
     };
 
     return (
         <div className="max-w-xl mx-auto py-8 mb-24 lg:mb-0">
-            <header className="mb-12 flex flex-col items-center gap-6">
-                <div className="text-center">
-                    <h2 className="text-4xl font-black tracking-tighter mb-1 text-[#111827]">Check-in</h2>
-                    <p className="text-gray-400 text-sm font-medium capitalize">
+            <header className="mb-12 flex flex-col items-center gap-6 text-center">
+                <div>
+                    <h2 className="text-4xl font-black tracking-tighter mb-2 text-[#111827]">Check-in</h2>
+                    <p className="text-gray-400 text-base font-medium capitalize">
                         {format(parseISO(selectedDate), "EEEE, d 'de' MMMM", { locale: ptBR })}
                     </p>
                 </div>
 
-                <div className="relative group">
-                    <div className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-[10px] text-xs font-black text-gray-700 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-1 transition-all duration-200 ease-out cursor-pointer">
-                        <Calendar size={18} className="text-[#111827]" />
+                <div className="relative group inline-block">
+                    {/* Visual Button */}
+                    <div className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-[12px] text-sm font-bold text-[#111827] shadow-lg group-hover:shadow-xl transition-all duration-200 cursor-pointer">
+                        <Calendar size={18} />
                         <span>Escolher Data</span>
                         <ChevronDown size={14} className="text-gray-300 ml-1" />
                     </div>
-                    {/* Fixed Date Picker Overlay - Fully Functional */}
+                    {/* Actual Hidden Input - Covers the whole button area for 100% click reliability */}
                     <input
                         ref={dateInputRef}
                         type="date"
@@ -109,8 +114,7 @@ export default function CheckIn() {
                         max="2030-12-31"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-[100]"
-                        onClick={(e) => e.stopPropagation()}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50 rounded-[12px]"
                     />
                 </div>
             </header>
@@ -148,16 +152,16 @@ export default function CheckIn() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#111827] text-white py-5 rounded-[10px] font-black text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-200 ease-out disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-xl active:scale-95"
+                    className="w-full bg-[#111827] text-white py-5 rounded-[12px] font-black text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200 ease-out disabled:opacity-50 active:scale-95"
                 >
                     {loading ? (
-                        <Loader2 className="animate-spin text-white" size={24} />
+                        <Loader2 className="animate-spin text-white mx-auto" size={24} />
                     ) : success ? (
-                        <span className="flex items-center gap-2 italic">✓ Salvo com sucesso</span>
+                        <span className="flex items-center justify-center gap-2 italic">✓ Salvo com sucesso</span>
                     ) : (
-                        <div className="flex items-center gap-3">
-                            <Save size={20} />
-                            <span>Finalizar Dia</span>
+                        <div className="flex items-center justify-center gap-3">
+                            {hasExistingData ? <Edit3 size={20} /> : <Save size={20} />}
+                            <span>{hasExistingData ? 'Editar dia' : 'Finalizar Dia'}</span>
                         </div>
                     )}
                 </button>
