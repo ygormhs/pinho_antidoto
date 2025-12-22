@@ -15,6 +15,7 @@ export default function Login() {
         setError('');
 
         try {
+            await new Promise(resolve => setTimeout(resolve, 5000));
             await login(email);
             // Redirect happens automatically as AuthProvider state changes
         } catch (err) {

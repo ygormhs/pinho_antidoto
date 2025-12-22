@@ -92,7 +92,7 @@ export default function CheckIn() {
 
                 <button
                     onClick={() => dateInputRef.current?.showPicker()}
-                    className="relative flex items-center gap-3 px-6 py-2.5 bg-white border border-gray-100 rounded-full text-sm font-black text-gray-700 shadow-3d hover:shadow-3d-lg transition-all duration-300"
+                    className="relative flex items-center gap-2 px-5 py-2 bg-white border border-gray-100 rounded-full text-xs font-black text-gray-700 shadow-3d hover:shadow-3d-lg transition-all duration-300"
                 >
                     <Calendar size={18} className="text-brand-text" />
                     <span>Escolher Data</span>
@@ -142,7 +142,7 @@ export default function CheckIn() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-brand-text text-white py-4 rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-2 hover:shadow-3d-lg transition-all disabled:opacity-50"
+                    className="w-full bg-brand-text text-white py-3 rounded-2xl font-black text-base flex items-center justify-center gap-2 hover:shadow-3d-lg transition-all disabled:opacity-50"
                 >
                     {loading ? (
                         <Loader2 className="animate-spin text-white" />

@@ -97,18 +97,18 @@ export default function Exercises() {
                 <div className="flex gap-2 p-2 bg-white/50 border border-white/50 rounded-3xl shadow-3d-lg backdrop-blur-xl">
                     <button
                         onClick={() => setActiveTab('meditation')}
-                        className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black transition-all duration-500 ${activeTab === 'meditation' ? 'bg-brand-text text-white shadow-3d scale-[1.05]' : 'text-gray-400 hover:text-brand-text'
+                        className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black transition-all duration-500 text-sm ${activeTab === 'meditation' ? 'bg-brand-text text-white shadow-3d scale-[1.05]' : 'text-gray-400 hover:text-brand-text'
                             }`}
                     >
-                        <Sparkles size={20} />
+                        <Sparkles size={16} />
                         Meditação
                     </button>
                     <button
                         onClick={() => setActiveTab('breathing')}
-                        className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black transition-all duration-500 ${activeTab === 'breathing' ? 'bg-brand-text text-white shadow-3d scale-[1.05]' : 'text-gray-400 hover:text-brand-text'
+                        className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black transition-all duration-500 text-sm ${activeTab === 'breathing' ? 'bg-brand-text text-white shadow-3d scale-[1.05]' : 'text-gray-400 hover:text-brand-text'
                             }`}
                     >
-                        <Wind size={20} />
+                        <Wind size={16} />
                         Respirando
                     </button>
                 </div>
@@ -138,15 +138,15 @@ export default function Exercises() {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={() => setIsPaused(!isPaused)}
-                                        className="flex items-center gap-2 bg-brand-text text-white px-10 py-5 rounded-[2rem] font-bold shadow-3d-lg hover:bg-black transition-all"
+                                        className="flex items-center gap-2 bg-brand-text text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-3d-lg hover:bg-black transition-all text-sm"
                                     >
-                                        {isPaused ? <Play fill="currentColor" size={20} /> : 'Pausar'}
+                                        {isPaused ? <Play fill="currentColor" size={16} /> : 'Pausar'}
                                     </button>
                                     <button
                                         onClick={() => setTimer(null)}
-                                        className="flex items-center gap-2 bg-white text-gray-400 px-10 py-5 rounded-[2rem] font-bold shadow-3d border border-white/50"
+                                        className="flex items-center gap-2 bg-white text-gray-400 px-8 py-4 rounded-[1.5rem] font-bold shadow-3d border border-white/50 text-sm"
                                     >
-                                        <RotateCcw size={20} /> Resetar
+                                        <RotateCcw size={16} /> Resetar
                                     </button>
                                 </div>
                             </div>
@@ -163,9 +163,9 @@ export default function Exercises() {
                                                 whileHover={{ y: -5, shadow: "var(--shadow-3d-lg)" }}
                                                 whileTap={{ scale: 0.95 }}
                                                 onClick={() => startMeditation(min)}
-                                                className="bg-white border border-white/50 p-8 rounded-[2.5rem] font-black text-center shadow-3d transition-all group"
+                                                className="bg-white border border-white/50 p-6 rounded-[2rem] font-black text-center shadow-3d transition-all group"
                                             >
-                                                <span className="text-4xl block mb-2 text-brand-text group-hover:scale-110 transition-transform">{min}</span>
+                                                <span className="text-3xl block mb-1 text-brand-text group-hover:scale-110 transition-transform">{min}</span>
                                                 <span className="text-[10px] uppercase tracking-[0.2em] font-black text-gray-300">Min</span>
                                             </motion.button>
                                         ))}
