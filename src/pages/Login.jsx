@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Loader2, Mail, ArrowRight } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -36,8 +37,8 @@ export default function Login() {
                 className="max-w-md w-full relative z-10"
             >
                 <div className="flex justify-center mb-12">
-                    <div className="w-16 h-16 bg-brand-text rounded-2xl flex items-center justify-center shadow-3d-lg">
-                        <Sparkles className="text-white" size={32} />
+                    <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-3d-lg border border-white/50 p-4">
+                        <img src={logo} alt="Antídoto Logo" className="w-full h-full object-contain opacity-90" />
                     </div>
                 </div>
 

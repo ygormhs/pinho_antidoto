@@ -46,24 +46,22 @@ export default function Dashboard() {
                 <p className="text-lg text-gray-500 font-medium">Faça o hoje valer a pena.</p>
             </header>
 
-            {/* REMOVED QUOTE CARD COMPLETELY AS REQUESTED */}
-
             {/* Heatmap Section */}
             <section>
                 <div className="flex items-center gap-4 mb-6 px-2">
                     <h3 className="text-xl lg:text-2xl font-black tracking-tighter text-gray-800">Seu Progresso</h3>
                 </div>
-                <div className="bg-white p-6 lg:p-8 rounded-[2rem] lg:rounded-[2.5rem] border border-gray-50 shadow-3d overflow-x-auto">
+                <div className="bg-white p-6 lg:p-8 rounded-card border border-gray-50 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-x-auto">
                     <Heatmap data={entries} showTitle={false} />
                 </div>
             </section>
 
             <section className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mt-8 lg:mt-12">
-                <div className="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-center">
+                <div className="bg-white p-6 lg:p-8 rounded-card border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 flex flex-col justify-center">
                     <p className="text-lg lg:text-xl font-medium leading-relaxed text-brand-text mb-4 italic">"{quote.text}"</p>
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">— {quote.author}</span>
                 </div>
-                <div className="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
+                <div className="bg-white p-6 lg:p-8 rounded-card border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
                     <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Trajetória</h3>
                     <p className="text-5xl font-bold tracking-tighter text-brand-text">
                         {entries.length}
@@ -76,7 +74,7 @@ export default function Dashboard() {
             <div className="mt-12 mb-8 lg:hidden flex justify-center">
                 <button
                     onClick={logout}
-                    className="text-gray-400 text-xs font-black uppercase tracking-[0.2em] hover:text-red-500 transition-colors flex items-center gap-2 py-4 px-8 rounded-full bg-gray-50/50"
+                    className="text-gray-400 text-xs font-black uppercase tracking-[0.2em] hover:text-red-500 transition-colors flex items-center gap-2 py-4 px-8 rounded-input bg-gray-50/50"
                 >
                     <LogOut size={14} /> Sair da conta
                 </button>

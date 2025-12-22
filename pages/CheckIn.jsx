@@ -95,25 +95,21 @@ export default function CheckIn() {
                     </p>
                 </div>
 
-                <div className="relative">
-                    <button
-                        type="button"
-                        onClick={() => dateInputRef.current?.showPicker()}
-                        className="relative z-10 flex items-center gap-2 px-5 py-2 bg-white border border-gray-100 rounded-full text-xs font-black text-gray-700 shadow-3d hover:shadow-3d-lg transition-all duration-300"
-                    >
+                <div className="relative group">
+                    <div className="grid grid-cols-[auto_1fr] items-center gap-2 px-5 py-2 bg-white border border-gray-100 rounded-input text-xs font-black text-gray-700 shadow-md group-hover:shadow-lg group-hover:-translate-y-1 transition-all duration-200 ease-out cursor-pointer">
                         <Calendar size={18} className="text-brand-text" />
                         <span>Escolher Data</span>
-                        <ChevronDown size={14} className="text-gray-300" />
-                    </button>
+                        <ChevronDown size={14} className="text-gray-300 ml-1" />
+                    </div>
+                    {/* Fixed Date Picker Overlay */}
                     <input
                         ref={dateInputRef}
                         type="date"
-                        min="2026-01-01"
-                        max="2026-12-31"
+                        min="2020-01-01" // Expanded range to prevent user issue
+                        max="2030-12-31"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                        style={{ top: 0, left: 0 }}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50"
                     />
                 </div>
             </header>
@@ -125,12 +121,12 @@ export default function CheckIn() {
                             key={q.id}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleToggle(q.id)}
-                            className={`flex items-center gap-3 p-4 rounded-3xl border transition-all cursor-pointer select-none ${formData[q.id]
-                                ? 'bg-brand-text border-brand-text text-white shadow-3d scale-[1.02]'
-                                : 'bg-white border-gray-50 text-brand-text hover:border-gray-200 shadow-3d'
+                            className={`flex items-center gap-3 p-4 rounded-card border transition-all duration-200 ease-out cursor-pointer select-none ${formData[q.id]
+                                ? 'bg-brand-text border-brand-text text-white shadow-md scale-[1.02]'
+                                : 'bg-white border-gray-50 text-brand-text hover:border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1'
                                 }`}
                         >
-                            <div className={`p-2 rounded-xl ${formData[q.id] ? 'bg-white/10' : 'bg-gray-50'}`}>
+                            <div className={`p-2 rounded-badge ${formData[q.id] ? 'bg-white/10' : 'bg-gray-50'}`}>
                                 <q.icon size={18} strokeWidth={formData[q.id] ? 3 : 2} />
                             </div>
                             <span className="font-bold text-sm tracking-tight leading-tight">{q.label}</span>
@@ -144,14 +140,14 @@ export default function CheckIn() {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Escreva aqui o seu dia..."
-                        className="w-full bg-white border border-gray-50 rounded-[2rem] p-8 min-h-[140px] outline-none focus:ring-4 focus:ring-brand-text/5 transition-all text-base resize-none shadow-3d placeholder:text-gray-300 leading-relaxed text-gray-700"
+                        className="w-full bg-white border border-gray-50 rounded-card p-6 min-h-[140px] outline-none focus:ring-4 focus:ring-brand-text/5 transition-all text-sm resize-none shadow-sm hover:shadow-md focus:shadow-md placeholder:text-gray-300 leading-relaxed text-gray-700"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-brand-text text-white py-3 rounded-2xl font-black text-base flex items-center justify-center gap-2 hover:shadow-3d-lg transition-all disabled:opacity-50"
+                    className="w-full bg-brand-text text-white py-3 rounded-input font-black text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-out disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-md"
                 >
                     {loading ? (
                         <Loader2 className="animate-spin text-white" />
