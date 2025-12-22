@@ -70,8 +70,20 @@ export default function CheckIn() {
         e.preventDefault();
         setLoading(true);
 
+        let userId = session.user.id;
+
+        // Safety check: if ID is an email (legacy session), resolve it to UUID
+        if (userId && userId.includes('@')) {
+            const { data } = await supabase
+                .from('allowed_users')
+                .select('id')
+                .eq('email', session.user.email)
+                .single();
+            if (data) userId = data.id;
+        }
+
         const payload = {
-            user_id: session.user.id,
+            user_id: userId,
             date: selectedDate,
             work_good: formData.work_good,
             day_good: formData.day_good,

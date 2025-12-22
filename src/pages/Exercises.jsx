@@ -73,11 +73,23 @@ export default function Exercises() {
         setTimer(null);
         setShowPlim(true);
 
+        let userId = session.user.id;
+
+        // Safety: resolve email-id to UUID
+        if (userId && userId.includes('@')) {
+            const { data } = await supabase
+                .from('allowed_users')
+                .select('id')
+                .eq('email', session.user.email)
+                .single();
+            if (data) userId = data.id;
+        }
+
         // Save meditation log to meditacao_2026
         const { error } = await supabase
             .from('meditacao_2026')
             .insert({
-                user_id: session.user.id,
+                user_id: userId,
                 duration: duration,
                 date: today
             });

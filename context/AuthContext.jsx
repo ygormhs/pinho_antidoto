@@ -8,12 +8,37 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check for pseudo-session in localStorage
-        const savedUser = localStorage.getItem('antidoto_user');
-        if (savedUser) {
-            setSession({ user: JSON.parse(savedUser) });
-        }
-        setLoading(false);
+        const checkUser = async () => {
+            const savedUserStr = localStorage.getItem('antidoto_user');
+            if (savedUserStr) {
+                try {
+                    const user = JSON.parse(savedUserStr);
+                    // If ID is an email, it's a legacy session from the previous version
+                    if (user.id && user.id.includes('@')) {
+                        const { data } = await supabase
+                            .from('allowed_users')
+                            .select('id')
+                            .eq('email', user.email)
+                            .single();
+
+                        if (data) {
+                            const updatedUser = { ...user, id: data.id };
+                            localStorage.setItem('antidoto_user', JSON.stringify(updatedUser));
+                            setSession({ user: updatedUser });
+                        } else {
+                            logout();
+                        }
+                    } else {
+                        setSession({ user });
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar sessão:", e);
+                    logout();
+                }
+            }
+            setLoading(false);
+        };
+        checkUser();
     }, []);
 
     const login = async (email) => {
