@@ -200,9 +200,11 @@ export default function Exercises() {
                                         <h3 className="text-xl font-black tracking-tight">Sua Jornada</h3>
                                         <button
                                             onClick={fetchMeditationStats}
-                                            className={`flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-brand-text transition-colors ${refreshing ? 'animate-spin' : ''}`}
+                                            disabled={refreshing}
+                                            className="p-3 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all shadow-3d active:scale-95 disabled:opacity-50"
+                                            title="Atualizar Stats"
                                         >
-                                            <RefreshCw size={14} /> Atualizar Stats
+                                            <RefreshCw className={`text-brand-text ${refreshing ? 'animate-spin' : ''}`} size={16} />
                                         </button>
                                     </div>
 
