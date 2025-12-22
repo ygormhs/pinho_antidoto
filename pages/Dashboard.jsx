@@ -20,7 +20,7 @@ export default function Dashboard() {
 
     const fetchEntries = async () => {
         const { data, error } = await supabase
-            .from('daily_checklist')
+            .from('diario_2026')
             .select('date, content')
             .eq('user_email', session.user.email);
 

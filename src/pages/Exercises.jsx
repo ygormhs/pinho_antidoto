@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, RotateCcw, Wind, Sparkles, Clock, History, Bell, RefreshCw } from 'lucide-react';
+import { Play, RotateCcw, Wind, Sparkles, Clock, History, Bell, RefreshCw, X } from 'lucide-react';
 import BreathingCircle from '../components/BreathingCircle';
-import Heatmap from '../components/Heatmap';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
@@ -31,11 +30,29 @@ export default function Exercises() {
 
     const fetchMeditationStats = async () => {
         setRefreshing(true);
-        const { data } = await supabase.from('meditacao_2026').select('*').eq('user_email', session.user.email);
+        // Lendo da tabela central diario_2026
+        const { data } = await supabase
+            .from('diario_2026')
+            .select('date, content')
+            .eq('user_email', session.user.email);
+
         if (data) {
-            const totalMin = data.reduce((acc, curr) => acc + curr.duration, 0);
-            const uniqueDays = new Set(data.map(d => d.date)).size;
-            setMeditationStats({ totalMinutes: totalMin, totalDays: uniqueDays, entries: data });
+            let totalMin = 0;
+            let daysWithMeditation = 0;
+
+            data.forEach(entry => {
+                const medMin = entry.content?.meditation_minutes || 0;
+                if (medMin > 0) {
+                    totalMin += medMin;
+                    daysWithMeditation++;
+                }
+            });
+
+            setMeditationStats({
+                totalMinutes: totalMin,
+                totalDays: daysWithMeditation,
+                entries: data
+            });
         }
         setTimeout(() => setRefreshing(false), 500);
     };
@@ -50,16 +67,41 @@ export default function Exercises() {
     const handleCompleteSession = async () => {
         const duration = timer;
         const today = new Date().toISOString().split('T')[0];
+
         try {
             const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
             audio.volume = 0.6;
             audio.play();
         } catch (e) { console.log("Erro som:", e) }
+
         setTimer(null);
         setShowPlim(true);
-        await supabase.from('meditacao_2026').insert({ user_email: session.user.email, duration: duration, date: today });
+
+        // PERSISTÊNCIA NA TABELA CENTRAL (diario_2026)
+        // 1. Buscar se já existe registro para hoje
+        const { data: existing } = await supabase
+            .from('diario_2026')
+            .select('content')
+            .eq('user_email', session.user.email)
+            .eq('date', today)
+            .single();
+
+        const currentContent = existing?.content || {};
+        const newMeditationMinutes = (currentContent.meditation_minutes || 0) + duration;
+
+        // 2. Upsert preservando dados já existentes no JSONB
+        await supabase
+            .from('diario_2026')
+            .upsert({
+                user_email: session.user.email,
+                date: today,
+                content: {
+                    ...currentContent,
+                    meditation_minutes: newMeditationMinutes
+                }
+            }, { onConflict: 'user_email,date' });
+
         await fetchMeditationStats();
-        setTimeout(() => setShowPlim(false), 6000);
     };
 
     const formatTime = (seconds) => {
@@ -69,19 +111,19 @@ export default function Exercises() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto py-8 lg:py-12 pb-32 lg:pb-12">
+        <div className="max-w-4xl mx-auto py-8 lg:py-12 pb-32 lg:pb-12 px-4">
             <header className="mb-8 lg:mb-12 flex flex-col items-center">
-                <h2 className="text-4xl lg:text-5xl font-black tracking-tighter mb-8 text-brand-text">Exercícios</h2>
-                <div className="flex gap-2 p-1.5 bg-white/50 border border-white/50 rounded-2xl shadow-3d backdrop-blur-xl">
+                <h2 className="text-4xl lg:text-5xl font-black tracking-tighter mb-8 text-[#111827]">Exercícios</h2>
+                <div className="flex gap-2 p-1.5 bg-white border border-gray-100 rounded-[18px] shadow-lg">
                     <button
                         onClick={() => setActiveTab('meditation')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-black transition-all duration-300 text-xs uppercase tracking-wider ${activeTab === 'meditation' ? 'bg-brand-text text-white shadow-md' : 'text-gray-400 hover:text-brand-text'}`}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-[12px] font-black transition-all duration-300 text-xs uppercase tracking-widest ${activeTab === 'meditation' ? 'bg-[#111827] text-white shadow-md' : 'text-gray-400 hover:text-[#111827]'}`}
                     >
                         <Sparkles size={14} /> Meditação
                     </button>
                     <button
                         onClick={() => setActiveTab('breathing')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-black transition-all duration-300 text-xs uppercase tracking-wider ${activeTab === 'breathing' ? 'bg-brand-text text-white shadow-md' : 'text-gray-400 hover:text-brand-text'}`}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-[12px] font-black transition-all duration-300 text-xs uppercase tracking-widest ${activeTab === 'breathing' ? 'bg-[#111827] text-white shadow-md' : 'text-gray-400 hover:text-[#111827]'}`}
                     >
                         <Wind size={14} /> Respirar
                     </button>
@@ -93,32 +135,37 @@ export default function Exercises() {
                     <motion.div key="med" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8 lg:space-y-12">
                         {timer ? (
                             <div className="flex flex-col items-center justify-center py-8 gap-8">
-                                <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="w-64 h-64 lg:w-80 lg:h-80 rounded-full border-8 border-white shadow-3d-lg flex items-center justify-center bg-white/40 backdrop-blur-md">
-                                    <div className="text-6xl lg:text-7xl font-black tracking-tighter text-brand-text tabular-nums">{formatTime(timeLeft)}</div>
+                                <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="w-64 h-64 lg:w-80 lg:h-80 rounded-full border-4 border-white shadow-2xl flex items-center justify-center bg-white/60 backdrop-blur-md relative overflow-hidden">
+                                    {/* Simple wave animation effect during timer */}
+                                    <motion.div
+                                        animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+                                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                        className="absolute inset-0 bg-[#111827]"
+                                    />
+                                    <div className="text-7xl lg:text-8xl font-black tracking-tighter text-[#111827] tabular-nums relative z-10">{formatTime(timeLeft)}</div>
                                 </motion.div>
                                 <div className="flex gap-4">
-                                    <button onClick={() => setIsPaused(!isPaused)} className="flex items-center gap-2 bg-brand-text text-white px-6 py-3 rounded-full font-bold shadow-3d hover:bg-black transition-all text-sm">
-                                        {isPaused ? <Play fill="currentColor" size={16} /> : 'Pausar'}
+                                    <button onClick={() => setIsPaused(!isPaused)} className="flex items-center gap-2 bg-[#111827] text-white px-8 py-4 rounded-[12px] font-black shadow-xl hover:shadow-2xl transition-all active:scale-95 text-base">
+                                        {isPaused ? <Play fill="currentColor" size={20} /> : 'Pausar'}
                                     </button>
-                                    <button onClick={() => setTimer(null)} className="flex items-center gap-2 bg-white text-gray-400 px-6 py-3 rounded-full font-bold shadow-3d border border-white/50 text-sm">
-                                        <RotateCcw size={16} /> Resetar
+                                    <button onClick={() => setTimer(null)} className="flex items-center gap-2 bg-white text-gray-400 px-8 py-4 rounded-[12px] font-black shadow-xl border border-gray-50 transition-all active:scale-95 text-base">
+                                        <RotateCcw size={20} /> Resetar
                                     </button>
                                 </div>
                             </div>
                         ) : (
-                            <div className="space-y-8 text-center max-w-lg mx-auto">
-                                {/* COMPACT TIMER SELECTION - NO SCROLLING */}
+                            <div className="space-y-12 text-center max-w-lg mx-auto">
                                 <section className="flex flex-col items-center gap-6">
-                                    <h3 className="text-xl font-black tracking-tight flex items-center gap-2 opacity-80">
-                                        <Clock size={20} className="text-gray-300" /> Escolha o tempo
+                                    <h3 className="text-xl font-black tracking-tighter flex items-center gap-2 text-gray-400 uppercase tracking-[0.2em] text-[11px]">
+                                        <Clock size={16} /> Escolha o tempo
                                     </h3>
-                                    <div className="flex flex-wrap justify-center gap-3 w-full">
+                                    <div className="flex flex-wrap justify-center gap-4 w-full">
                                         {timerOptions.map((min) => (
                                             <motion.button
                                                 key={min}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => startMeditation(min)}
-                                                className="w-14 h-14 lg:w-16 lg:h-16 bg-white border border-gray-100 rounded-2xl lg:rounded-3xl font-black text-xl lg:text-2xl text-brand-text shadow-sm hover:shadow-md transition-all flex items-center justify-center"
+                                                className="w-16 h-16 lg:w-20 lg:h-20 bg-white border border-gray-50 rounded-[18px] font-black text-2xl lg:text-3xl text-[#111827] shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-center"
                                             >
                                                 {min}
                                             </motion.button>
@@ -126,46 +173,35 @@ export default function Exercises() {
                                     </div>
                                 </section>
 
-                                <AnimatePresence>
-                                    {showPlim && (
-                                        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-brand-text text-white p-6 rounded-3xl shadow-3d flex flex-col items-center gap-3 text-center z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-xs">
-                                            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center animate-bounce"><Bell size={24} /></div>
-                                            <h4 className="text-2xl font-black italic">PLIM! ✨</h4>
-                                            <button onClick={() => setShowPlim(false)} className="mt-2 text-[10px] font-bold uppercase tracking-widest bg-white/10 px-4 py-2 rounded-full">Fechar</button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                <section className="space-y-6">
-                                    <div className="flex justify-between items-center px-2">
-                                        <h3 className="text-lg font-black tracking-tight opacity-80">Sua Jornada</h3>
-                                        <button onClick={fetchMeditationStats} disabled={refreshing} className="p-2 bg-white rounded-xl hover:bg-gray-50 transition-all shadow-sm active:scale-95 disabled:opacity-50">
-                                            <RefreshCw className={`text-brand-text ${refreshing ? 'animate-spin' : ''}`} size={14} />
+                                <section className="space-y-8 pt-8">
+                                    <div className="flex justify-between items-center px-4">
+                                        <h3 className="text-xs font-black uppercase tracking-[0.25em] text-gray-400">Sua Jornada</h3>
+                                        <button onClick={fetchMeditationStats} disabled={refreshing} className="p-2.5 bg-white border border-gray-50 rounded-xl hover:bg-gray-50 transition-all shadow-md active:scale-95 disabled:opacity-50">
+                                            <RefreshCw className={`text-[#111827] ${refreshing ? 'animate-spin' : ''}`} size={16} />
                                         </button>
                                     </div>
 
-                                    {/* COMPACT STATS CARDS */}
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <div className="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm flex items-center gap-5">
-                                            <div className="bg-gray-50 p-4 rounded-2xl text-brand-text">
-                                                <History size={24} />
+                                    <div className="grid grid-cols-1 gap-6">
+                                        <div className="bg-white p-7 rounded-[14px] border border-gray-50 shadow-xl flex items-center gap-6 group hover:shadow-2xl transition-all duration-300">
+                                            <div className="bg-gray-50 p-5 rounded-[12px] text-[#111827] group-hover:scale-110 transition-transform">
+                                                <History size={28} />
                                             </div>
                                             <div className="text-left">
-                                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-0.5">Frequência</p>
-                                                <p className="text-4xl font-black tracking-tighter text-gray-800 leading-none">
-                                                    {meditationStats.totalDays} <span className="text-sm text-gray-400 font-medium ml-1">dias</span>
+                                                <p className="text-gray-400 text-[11px] font-black uppercase tracking-[0.2em] mb-1">Frequência</p>
+                                                <p className="text-5xl font-black tracking-tighter text-[#111827] leading-none">
+                                                    {meditationStats.totalDays} <span className="text-xl text-gray-300 font-medium ml-1 tracking-widest">DIAS</span>
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <div className="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm flex items-center gap-5">
-                                            <div className="bg-gray-50 p-4 rounded-2xl text-brand-text">
-                                                <Clock size={24} />
+                                        <div className="bg-white p-7 rounded-[14px] border border-gray-50 shadow-xl flex items-center gap-6 group hover:shadow-2xl transition-all duration-300">
+                                            <div className="bg-gray-50 p-5 rounded-[12px] text-[#111827] group-hover:scale-110 transition-transform">
+                                                <Clock size={28} />
                                             </div>
                                             <div className="text-left">
-                                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-0.5">Tempo Total</p>
-                                                <p className="text-4xl font-black tracking-tighter text-gray-800 leading-none">
-                                                    {meditationStats.totalMinutes} <span className="text-sm text-gray-400 font-medium ml-1">min</span>
+                                                <p className="text-gray-400 text-[11px] font-black uppercase tracking-[0.2em] mb-1">Tempo Total</p>
+                                                <p className="text-5xl font-black tracking-tighter text-[#111827] leading-none">
+                                                    {meditationStats.totalMinutes} <span className="text-xl text-gray-300 font-medium ml-1 tracking-widest">MIN</span>
                                                 </p>
                                             </div>
                                         </div>
@@ -175,8 +211,41 @@ export default function Exercises() {
                         )}
                     </motion.div>
                 ) : (
-                    <motion.div key="breath" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="bg-white p-8 lg:p-12 rounded-3xl lg:rounded-[3rem] border border-white/50 shadow-sm">
+                    <motion.div key="breath" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="bg-white p-8 lg:p-12 rounded-[14px] lg:rounded-[2rem] border border-gray-50 shadow-2xl">
                         <BreathingCircle />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* DEFINITIVE PLIM POPUP CENTERING */}
+            <AnimatePresence>
+                {showPlim && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#111827]/40 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-[#111827] text-white p-10 rounded-[2rem] shadow-2xl flex flex-col items-center gap-6 text-center max-w-sm w-full border border-white/10"
+                        >
+                            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center animate-bounce text-white">
+                                <Bell size={32} />
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="text-4xl font-black italic tracking-tighter">PLIM! ✨</h4>
+                                <p className="text-gray-400 font-medium">Sessão concluída com sucesso.</p>
+                            </div>
+                            <button
+                                onClick={() => setShowPlim(false)}
+                                className="w-full bg-white text-[#111827] py-4 rounded-[12px] font-black text-sm uppercase tracking-widest shadow-xl hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2"
+                            >
+                                <X size={16} strokeWidth={3} /> Fechar
+                            </button>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>

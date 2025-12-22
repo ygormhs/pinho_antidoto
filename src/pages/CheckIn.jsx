@@ -35,7 +35,7 @@ export default function CheckIn() {
 
     const fetchEntry = async (date) => {
         const { data } = await supabase
-            .from('daily_checklist')
+            .from('diario_2026')
             .select('content')
             .eq('user_email', session.user.email)
             .eq('date', date)
@@ -76,7 +76,7 @@ export default function CheckIn() {
         };
 
         await supabase
-            .from('daily_checklist')
+            .from('diario_2026')
             .upsert({
                 user_email: session.user.email,
                 date: selectedDate,
