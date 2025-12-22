@@ -31,25 +31,22 @@ export default function Exercises() {
     const fetchMeditationStats = async () => {
         setRefreshing(true);
         const { data } = await supabase
-            .from('daily_logs')
-            .select('entry_date, tasks')
-            .eq('user_email', session.user.email);
+            .from('meditacao_2026')
+            .select('duration, date')
+            .eq('user_id', session.user.id);
 
         if (data) {
             let totalMin = 0;
-            let daysWithMeditation = 0;
+            const uniqueDays = new Set();
 
-            data.forEach(entry => {
-                const medMin = entry.tasks?.meditation_minutes || 0;
-                if (medMin > 0) {
-                    totalMin += medMin;
-                    daysWithMeditation++;
-                }
+            data.forEach(session => {
+                totalMin += session.duration || 0;
+                uniqueDays.add(session.date);
             });
 
             setMeditationStats({
                 totalMinutes: totalMin,
-                totalDays: daysWithMeditation,
+                totalDays: uniqueDays.size,
                 entries: data
             });
         }
@@ -76,28 +73,18 @@ export default function Exercises() {
         setTimer(null);
         setShowPlim(true);
 
-        const { data: existing } = await supabase
-            .from('daily_logs')
-            .select('tasks, notes')
-            .eq('user_email', session.user.email)
-            .eq('entry_date', today)
-            .single();
+        // Save meditation log to meditacao_2026
+        const { error } = await supabase
+            .from('meditacao_2026')
+            .insert({
+                user_id: session.user.id,
+                duration: duration,
+                date: today
+            });
 
-        const currentTasks = existing?.tasks || {};
-        const currentNotes = existing?.notes || '';
-        const newMeditationMinutes = (currentTasks.meditation_minutes || 0) + duration;
-
-        await supabase
-            .from('daily_logs')
-            .upsert({
-                user_email: session.user.email,
-                entry_date: today,
-                tasks: {
-                    ...currentTasks,
-                    meditation_minutes: newMeditationMinutes
-                },
-                notes: currentNotes
-            }, { onConflict: 'user_email,entry_date' });
+        if (error) {
+            console.error('Erro ao salvar meditação:', error);
+        }
 
         await fetchMeditationStats();
     };

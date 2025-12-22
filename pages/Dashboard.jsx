@@ -20,9 +20,9 @@ export default function Dashboard() {
 
     const fetchEntries = async () => {
         const { data, error } = await supabase
-            .from('daily_logs')
-            .select('entry_date, tasks, notes')
-            .eq('user_email', session.user.email);
+            .from('diario_2026')
+            .select('*')
+            .eq('user_id', session.user.id);
 
         if (data) {
             setEntries(data);

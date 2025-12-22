@@ -12,9 +12,9 @@ export default function Heatmap({ entries = [], showTitle = true }) {
     }, []);
 
     const getEntryContent = (date) => {
-        const entry = entries.find(e => isSameDay(new Date(e.entry_date), date));
-        // Check if entry exists and has non-empty tasks
-        if (entry && entry.tasks && Object.keys(entry.tasks).length > 0) {
+        const entry = entries.find(e => isSameDay(new Date(e.date), date));
+        // Check if entry exists and has any recorded activity
+        if (entry && (entry.work_good || entry.day_good || entry.sleep_good || entry.tasks_done || entry.notes)) {
             return entry;
         }
         return null;
@@ -49,13 +49,12 @@ export default function Heatmap({ entries = [], showTitle = true }) {
                         // Generate summary for tooltip
                         let summary = "Sem registros";
                         if (active) {
-                            const c = entry.tasks;
                             const parts = [];
-                            if (c.work_good) parts.push("Trabalho");
-                            if (c.day_good) parts.push("Dia Bom");
-                            if (c.sleep_good) parts.push("Sono");
-                            if (c.tasks_done) parts.push("Metas");
-                            if (c.meditation_minutes) parts.push(`Meditação (${c.meditation_minutes}m)`);
+                            if (entry.work_good) parts.push("Trabalho");
+                            if (entry.day_good) parts.push("Dia Bom");
+                            if (entry.sleep_good) parts.push("Sono");
+                            if (entry.tasks_done) parts.push("Metas");
+                            if (entry.notes) parts.push("Diário");
                             summary = parts.length > 0 ? parts.join(", ") : "Registrado";
                         }
 

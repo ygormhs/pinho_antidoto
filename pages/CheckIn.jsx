@@ -35,20 +35,19 @@ export default function CheckIn() {
 
     const fetchEntry = async (date) => {
         const { data } = await supabase
-            .from('daily_logs')
+            .from('diario_2026')
             .select('*')
-            .eq('user_email', session.user.email)
-            .eq('entry_date', date)
+            .eq('user_id', session.user.id)
+            .eq('date', date)
             .single();
 
         if (data) {
             setHasExistingData(true);
-            const savedTasks = data.tasks || {};
             setFormData({
-                work_good: savedTasks.work_good || false,
-                day_good: savedTasks.day_good || false,
-                sleep_good: savedTasks.sleep_good || false,
-                tasks_done: savedTasks.tasks_done || false,
+                work_good: data.work_good || false,
+                day_good: data.day_good || false,
+                sleep_good: data.sleep_good || false,
+                tasks_done: data.tasks_done || false,
             });
             setNotes(data.notes || '');
         } else {
@@ -72,15 +71,20 @@ export default function CheckIn() {
         setLoading(true);
 
         const payload = {
-            user_email: session.user.email,
-            entry_date: selectedDate,
-            tasks: formData,
-            notes: notes
+            user_id: session.user.id,
+            date: selectedDate,
+            work_good: formData.work_good,
+            day_good: formData.day_good,
+            sleep_good: formData.sleep_good,
+            tasks_done: formData.tasks_done,
+            notes: notes,
+            habits: {},
+            metrics: {}
         };
 
         const { error } = await supabase
-            .from('daily_logs')
-            .upsert(payload, { onConflict: 'user_email,entry_date' });
+            .from('diario_2026')
+            .upsert(payload, { onConflict: 'user_id,date' });
 
         if (error) {
             console.error('Erro ao salvar checklist:', error);

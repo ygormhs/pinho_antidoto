@@ -20,18 +20,18 @@ export function AuthProvider({ children }) {
         const cleanEmail = email.trim().toLowerCase();
 
         // Whitelist check
-        const { data, error: countError } = await supabase
+        const { data, error: fetchError } = await supabase
             .from('allowed_users')
-            .select('email')
+            .select('id, email')
             .eq('email', cleanEmail)
             .single();
 
-        if (countError || !data) {
+        if (fetchError || !data) {
             throw new Error('Acesso não autorizado. Adquira o Antídoto.');
         }
 
-        // Create pseudo-session
-        const pseudoUser = { email: cleanEmail, id: cleanEmail };
+        // Create pseudo-session with REAL id from database
+        const pseudoUser = { email: cleanEmail, id: data.id };
         localStorage.setItem('antidoto_user', JSON.stringify(pseudoUser));
         setSession({ user: pseudoUser });
 
