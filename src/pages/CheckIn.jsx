@@ -125,7 +125,7 @@ export default function CheckIn() {
     };
 
     return (
-        <div className="max-w-xl mx-auto py-8 mb-24 lg:mb-0">
+        <div className="max-w-xl mx-auto py-8 pb-8 lg:pb-0">
             <header className="mb-12 flex flex-col items-center gap-6 text-center">
                 <div>
                     <h2 className="text-4xl font-black tracking-tighter mb-2 text-[#111827]">Check-in</h2>
@@ -147,12 +147,11 @@ export default function CheckIn() {
                     <input
                         ref={dateInputRef}
                         type="date"
-                        min="2024-01-01"
-                        max="2030-12-31"
+                        min="2026-01-01"
+                        max="2026-12-31"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        className="absolute h-0 w-0 opacity-0 pointer-events-none"
-                        style={{ border: 'none', padding: 0 }}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                 </div>
             </header>

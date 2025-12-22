@@ -150,20 +150,26 @@ export default function Exercises() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="space-y-12 text-center max-w-lg mx-auto">
-                                <section className="flex flex-col items-center gap-6">
-                                    <h3 className="text-xl font-black tracking-tighter flex items-center gap-2 text-gray-400 uppercase tracking-[0.2em] text-[11px]">
-                                        <Clock size={16} /> Escolha o tempo
-                                    </h3>
-                                    <div className="flex flex-wrap justify-center gap-4 w-full">
+                            <div className="space-y-10 text-center max-w-md mx-auto px-4">
+                                <section className="flex flex-col items-center gap-8">
+                                    <div className="space-y-2">
+                                        <h3 className="text-2xl font-black tracking-tight text-[#111827]">
+                                            Meditar
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">Escolha a duração da sessão</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-3 w-full">
                                         {timerOptions.map((min) => (
                                             <motion.button
                                                 key={min}
-                                                whileTap={{ scale: 0.9 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                whileHover={{ scale: 1.02 }}
                                                 onClick={() => startMeditation(min)}
-                                                className="w-16 h-16 lg:w-20 lg:h-20 bg-white border border-gray-50 rounded-[18px] font-black text-2xl lg:text-3xl text-[#111827] shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-center"
+                                                className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 border border-gray-100 rounded-2xl py-5 font-bold text-[#111827] shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center gap-1"
                                             >
-                                                {min}
+                                                <span className="text-3xl font-black">{min}</span>
+                                                <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">min</span>
                                             </motion.button>
                                         ))}
                                     </div>

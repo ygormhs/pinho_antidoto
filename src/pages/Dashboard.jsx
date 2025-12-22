@@ -48,7 +48,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="space-y-12 pt-8 pb-32 lg:pb-0">
+        <div className="space-y-12 pt-8 pb-8 lg:pb-0">
             <header className="mb-12 text-center lg:text-left">
                 <h1 className="text-5xl lg:text-6xl font-black tracking-tighter text-[#111827] mb-2">
                     Olá, <span className="opacity-40">{getUserName()}</span>
@@ -79,7 +79,7 @@ export default function Dashboard() {
                 </div>
             </section>
 
-            <div className="mt-16 mb-8 lg:hidden flex justify-center">
+            <div className="mt-8 mb-4 lg:hidden flex justify-center">
                 <button
                     onClick={logout}
                     className="text-gray-400 text-xs font-black uppercase tracking-[0.25em] hover:text-red-500 transition-all flex items-center gap-3 py-5 px-10 rounded-[10px] bg-white border border-gray-50 shadow-lg"
