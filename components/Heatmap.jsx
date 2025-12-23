@@ -1,9 +1,14 @@
-import React, { useMemo } from 'react';
-import { format, eachDayOfInterval, startOfYear, endOfYear, isSameDay, isFuture } from 'date-fns';
-import { motion } from 'framer-motion';
+import React, { useMemo, useState } from 'react';
+import { format, eachDayOfInterval, startOfYear, endOfYear } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip } from 'react-tooltip';
+import { X, Briefcase, Smile, Moon, Target } from 'lucide-react';
 
 export default function Heatmap({ entries = [], showTitle = true }) {
+    const [selectedEntry, setSelectedEntry] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(null);
+
     const days = useMemo(() => {
         return eachDayOfInterval({
             start: startOfYear(new Date(2026, 0, 1)),
@@ -12,98 +17,175 @@ export default function Heatmap({ entries = [], showTitle = true }) {
     }, []);
 
     const getEntryContent = (date) => {
-        // Use manual YYYY-MM-DD format to avoid timezone issues
         const dateStr = format(date, 'yyyy-MM-dd');
         const entry = entries.find(e => e.date === dateStr);
-        // Check if entry exists and has any recorded activity
         if (entry && (entry.work_good || entry.day_good || entry.sleep_good || entry.tasks_done || entry.notes)) {
             return entry;
         }
         return null;
     };
 
-    // Debug: log entries on first load
-    React.useEffect(() => {
-        if (entries.length > 0) {
-            console.log('Heatmap entries loaded:', entries.map(e => e.date));
+    const handleDayClick = (day, entry) => {
+        if (entry) {
+            setSelectedEntry(entry);
+            setSelectedDate(day);
         }
-    }, [entries]);
+    };
+
+    const closeModal = () => {
+        setSelectedEntry(null);
+        setSelectedDate(null);
+    };
 
     return (
-        <div className="bg-white p-8 rounded-[2rem] border border-white/50 shadow-3d-lg overflow-x-auto">
-            <div className="flex flex-col gap-6 min-w-[800px]">
-                {showTitle && (
-                    <div className="flex justify-between items-center px-2">
-                        <h3 className="font-bold text-lg tracking-tight">Seu Ano em 2026</h3>
-                        <div className="flex gap-4 text-xs text-gray-400">
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-3 h-3 bg-gray-100 rounded-sm"></div>
-                                <span>Vazio</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-3 h-3 bg-brand-text rounded-sm"></div>
-                                <span>Registro</span>
+        <>
+            <div className="bg-white p-8 rounded-[2rem] border border-white/50 shadow-3d-lg overflow-x-auto">
+                <div className="flex flex-col gap-6 min-w-[800px]">
+                    {showTitle && (
+                        <div className="flex justify-between items-center px-2">
+                            <h3 className="font-bold text-lg tracking-tight">Seu Ano em 2026</h3>
+                            <div className="flex gap-4 text-xs text-gray-400">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-3 h-3 bg-gray-100 rounded-sm"></div>
+                                    <span>Vazio</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-3 h-3 bg-brand-text rounded-sm"></div>
+                                    <span>Registro</span>
+                                </div>
                             </div>
                         </div>
+                    )}
+
+                    <div className="grid grid-flow-col grid-rows-7 gap-1.5">
+                        {days.map((day, idx) => {
+                            const entry = getEntryContent(day);
+                            const active = !!entry;
+                            const dateStr = format(day, 'dd/MM/yyyy');
+                            const dateKey = format(day, 'yyyy-MM-dd');
+                            const tooltipId = `tooltip-${dateKey}`;
+
+                            let summary = "Sem registros";
+                            if (active) {
+                                const parts = [];
+                                if (entry.work_good) parts.push("Trabalho");
+                                if (entry.day_good) parts.push("Dia Bom");
+                                if (entry.sleep_good) parts.push("Sono");
+                                if (entry.tasks_done) parts.push("Metas");
+                                if (entry.notes) parts.push("Diário");
+                                summary = parts.length > 0 ? parts.join(", ") : "Registrado";
+                            }
+
+                            return (
+                                <div key={dateKey}>
+                                    <motion.div
+                                        data-tooltip-id={tooltipId}
+                                        data-tooltip-content={`${dateStr} - ${summary}`}
+                                        initial={false}
+                                        animate={{ backgroundColor: active ? '#111827' : '#F3F4F6' }}
+                                        whileHover={{ scale: 1.2, zIndex: 10 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => handleDayClick(day, entry)}
+                                        className={`w-3.5 h-3.5 rounded-sm transition-colors ${active ? 'cursor-pointer' : 'cursor-default'} ${active ? '' : 'hover:bg-gray-200'}`}
+                                    />
+                                    <Tooltip id={tooltipId} style={{ fontSize: '10px', padding: '4px 8px', borderRadius: '8px' }} />
+                                </div>
+                            );
+                        })}
                     </div>
-                )}
 
-                <div className="grid grid-flow-col grid-rows-7 gap-1.5">
-                    {days.map((day, idx) => {
-                        const entry = getEntryContent(day);
-                        const active = !!entry;
-                        const dateStr = format(day, 'dd/MM/yyyy');
-                        const dateKey = format(day, 'yyyy-MM-dd');
-                        const tooltipId = `tooltip-${dateKey}`;
-
-                        // Debug first 5 days of January
-                        if (idx < 5) {
-                            console.log(`Day ${idx}: ${dateKey}, entry found: ${active}`);
-                        }
-
-                        // Generate summary for tooltip
-                        let summary = "Sem registros";
-                        if (active) {
-                            const parts = [];
-                            if (entry.work_good) parts.push("Trabalho");
-                            if (entry.day_good) parts.push("Dia Bom");
-                            if (entry.sleep_good) parts.push("Sono");
-                            if (entry.tasks_done) parts.push("Metas");
-                            if (entry.notes) parts.push("Diário");
-                            summary = parts.length > 0 ? parts.join(", ") : "Registrado";
-                        }
-
-                        return (
-                            <div key={dateKey}> {/* Wrapper for tooltip anchor */}
-                                <motion.div
-                                    data-tooltip-id={tooltipId}
-                                    data-tooltip-content={`${dateStr} - ${summary}`}
-                                    initial={false}
-                                    animate={{ backgroundColor: active ? '#111827' : '#F3F4F6' }}
-                                    whileHover={{ scale: 1.2, zIndex: 10 }}
-                                    className={`w-3.5 h-3.5 rounded-sm transition-colors cursor-help ${active ? '' : 'hover:bg-gray-200'}`}
-                                />
-                                <Tooltip id={tooltipId} style={{ fontSize: '10px', padding: '4px 8px', borderRadius: '8px' }} />
-                            </div>
-                        );
-                    })}
-                </div>
-
-                <div className="flex justify-between text-[10px] text-gray-400 font-medium px-2 uppercase tracking-widest">
-                    <span>Jan</span>
-                    <span>Fev</span>
-                    <span>Mar</span>
-                    <span>Abr</span>
-                    <span>Mai</span>
-                    <span>Jun</span>
-                    <span>Jul</span>
-                    <span>Ago</span>
-                    <span>Set</span>
-                    <span>Out</span>
-                    <span>Nov</span>
-                    <span>Dez</span>
+                    <div className="flex justify-between text-[10px] text-gray-400 font-medium px-2 uppercase tracking-widest">
+                        <span>Jan</span>
+                        <span>Fev</span>
+                        <span>Mar</span>
+                        <span>Abr</span>
+                        <span>Mai</span>
+                        <span>Jun</span>
+                        <span>Jul</span>
+                        <span>Ago</span>
+                        <span>Set</span>
+                        <span>Out</span>
+                        <span>Nov</span>
+                        <span>Dez</span>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {/* Modal */}
+            <AnimatePresence>
+                {selectedEntry && selectedDate && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={closeModal}
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white rounded-[20px] shadow-2xl max-w-md w-full overflow-hidden"
+                        >
+                            {/* Header */}
+                            <div className="bg-[#111827] text-white p-6 flex justify-between items-start">
+                                <div>
+                                    <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Registro do Dia</p>
+                                    <h3 className="text-2xl font-black tracking-tight capitalize">
+                                        {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={closeModal}
+                                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            {/* Content */}
+                            <div className="p-6 space-y-6">
+                                {/* Status indicators */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className={`flex items-center gap-3 p-4 rounded-xl ${selectedEntry.work_good ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-400'}`}>
+                                        <Briefcase size={20} />
+                                        <span className="font-medium text-sm">Trabalho produtivo</span>
+                                    </div>
+                                    <div className={`flex items-center gap-3 p-4 rounded-xl ${selectedEntry.day_good ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-400'}`}>
+                                        <Smile size={20} />
+                                        <span className="font-medium text-sm">Dia foi bom</span>
+                                    </div>
+                                    <div className={`flex items-center gap-3 p-4 rounded-xl ${selectedEntry.sleep_good ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-400'}`}>
+                                        <Moon size={20} />
+                                        <span className="font-medium text-sm">Dormiu bem</span>
+                                    </div>
+                                    <div className={`flex items-center gap-3 p-4 rounded-xl ${selectedEntry.tasks_done ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-400'}`}>
+                                        <Target size={20} />
+                                        <span className="font-medium text-sm">Metas cumpridas</span>
+                                    </div>
+                                </div>
+
+                                {/* Diary notes */}
+                                {selectedEntry.notes && (
+                                    <div className="space-y-2">
+                                        <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Diário</h4>
+                                        <div className="bg-gray-50 rounded-xl p-4">
+                                            <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                                                {selectedEntry.notes}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!selectedEntry.notes && (
+                                    <p className="text-center text-gray-400 text-sm py-4">Nenhum registro no diário</p>
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
     );
 }
