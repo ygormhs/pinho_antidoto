@@ -135,15 +135,6 @@ export default function CheckIn() {
                 </div>
 
                 <div className="relative inline-block">
-                    <button
-                        type="button"
-                        onClick={openDatePicker}
-                        className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-[12px] text-sm font-bold text-[#111827] shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 relative z-10"
-                    >
-                        <Calendar size={18} />
-                        <span>Escolher Data</span>
-                        <ChevronDown size={14} className="text-gray-300 ml-1" />
-                    </button>
                     <input
                         ref={dateInputRef}
                         type="date"
@@ -151,13 +142,14 @@ export default function CheckIn() {
                         max="2026-12-31"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        className="absolute top-0 left-0 w-full h-full opacity-0 pointer-events-none"
+                        className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-[12px] text-sm font-bold text-[#111827] shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 cursor-pointer appearance-none"
+                        style={{ colorScheme: 'light' }}
                     />
                 </div>
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-2 gap-5">
+                <div className="flex flex-col gap-4">
                     {questions.map((q) => (
                         <motion.div
                             key={q.id}

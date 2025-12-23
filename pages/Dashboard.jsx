@@ -61,7 +61,7 @@ export default function Dashboard() {
                     <h3 className="text-2xl font-black tracking-tighter text-[#111827]">Seu Progresso</h3>
                 </div>
                 <div className="bg-white p-8 lg:p-12 rounded-[14px] border border-gray-50 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-x-auto">
-                    <Heatmap data={entries} showTitle={false} />
+                    <Heatmap entries={entries} showTitle={false} />
                 </div>
             </section>
 
