@@ -3,11 +3,18 @@ import { format, eachDayOfInterval, startOfYear, endOfYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip } from 'react-tooltip';
-import { X, Briefcase, Smile, Moon, Target } from 'lucide-react';
+import { X, Briefcase, Smile, Moon, Target, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function Heatmap({ entries = [], showTitle = true }) {
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
+
+    // Get sorted list of entries with dates
+    const sortedEntries = useMemo(() => {
+        return entries
+            .filter(e => e.work_good || e.day_good || e.sleep_good || e.tasks_done || e.notes)
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+    }, [entries]);
 
     const days = useMemo(() => {
         return eachDayOfInterval({
@@ -31,6 +38,21 @@ export default function Heatmap({ entries = [], showTitle = true }) {
             setSelectedDate(day);
         }
     };
+
+    const navigateEntry = (direction) => {
+        if (!selectedEntry) return;
+        const currentIndex = sortedEntries.findIndex(e => e.date === selectedEntry.date);
+        const newIndex = currentIndex + direction;
+
+        if (newIndex >= 0 && newIndex < sortedEntries.length) {
+            const newEntry = sortedEntries[newIndex];
+            setSelectedEntry(newEntry);
+            setSelectedDate(new Date(newEntry.date + 'T12:00:00'));
+        }
+    };
+
+    const canNavigatePrev = selectedEntry && sortedEntries.findIndex(e => e.date === selectedEntry.date) > 0;
+    const canNavigateNext = selectedEntry && sortedEntries.findIndex(e => e.date === selectedEntry.date) < sortedEntries.length - 1;
 
     const closeModal = () => {
         setSelectedEntry(null);
@@ -129,19 +151,35 @@ export default function Heatmap({ entries = [], showTitle = true }) {
                             className="bg-white rounded-[20px] shadow-2xl max-w-md w-full overflow-hidden"
                         >
                             {/* Header */}
-                            <div className="bg-[#111827] text-white p-6 flex justify-between items-start">
-                                <div>
-                                    <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Registro do Dia</p>
-                                    <h3 className="text-2xl font-black tracking-tight capitalize">
-                                        {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
-                                    </h3>
+                            <div className="bg-[#111827] text-white p-6">
+                                <div className="flex justify-between items-start mb-3">
+                                    <p className="text-xs uppercase tracking-widest text-gray-400">Registro do Dia</p>
+                                    <button
+                                        onClick={closeModal}
+                                        className="p-2 rounded-full hover:bg-white/10 transition-colors -mt-1 -mr-1"
+                                    >
+                                        <X size={20} />
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={closeModal}
-                                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                                >
-                                    <X size={20} />
-                                </button>
+                                <div className="flex items-center justify-between gap-4">
+                                    <button
+                                        onClick={() => navigateEntry(-1)}
+                                        disabled={!canNavigatePrev}
+                                        className={`p-2 rounded-full transition-colors ${canNavigatePrev ? 'hover:bg-white/10 text-white' : 'text-gray-600 cursor-not-allowed'}`}
+                                    >
+                                        <ChevronLeft size={24} />
+                                    </button>
+                                    <h3 className="text-xl font-black tracking-tight capitalize text-center flex-1">
+                                        {format(selectedDate, "d 'de' MMMM", { locale: ptBR })}
+                                    </h3>
+                                    <button
+                                        onClick={() => navigateEntry(1)}
+                                        disabled={!canNavigateNext}
+                                        className={`p-2 rounded-full transition-colors ${canNavigateNext ? 'hover:bg-white/10 text-white' : 'text-gray-600 cursor-not-allowed'}`}
+                                    >
+                                        <ChevronRight size={24} />
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Content */}
